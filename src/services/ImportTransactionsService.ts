@@ -22,6 +22,7 @@ class ImportTransactionsService {
     const contacsReadStream = fs.createReadStream(filePath);
 
     const parsers = csvParse({
+      delimiter: ',',
       from_line: 2,
     });
 
@@ -49,24 +50,45 @@ class ImportTransactionsService {
         title: In(categories),
       },
     });
+    console.log({
+      str: 'linha ExistentCategories -> categoriesRepository.find ',
+      existentCategories,
+    });
 
     const existentCategoriesTitles = existentCategories.map(
       (category: Category) => category.title,
     );
+    console.log({
+      str: 'linha existentCategoriesTitles ',
+      existentCategoriesTitles,
+    });
 
     const addCategoryTitles = categories
       .filter(category => !existentCategoriesTitles.includes(category))
       .filter((value, index, self) => self.indexOf(value) === index);
+
+    console.log({
+      str: 'linha addCategoryTitles ',
+      addCategoryTitles,
+    });
 
     const newCategories = categoriesRepository.create(
       addCategoryTitles.map(title => ({
         title,
       })),
     );
+    console.log({
+      str: 'linha newCategories ',
+      newCategories,
+    });
 
     await categoriesRepository.save(newCategories);
 
     const finalCategories = [...newCategories, ...existentCategories];
+    console.log({
+      str: 'linha finalCategories ',
+      finalCategories,
+    });
 
     const createdTransactions = transactionsRepository.create(
       transactions.map(transaction => ({
@@ -78,8 +100,17 @@ class ImportTransactionsService {
         ),
       })),
     );
+    console.log({
+      str: 'linha createdTransactions ',
+      createdTransactions,
+    });
 
     await transactionsRepository.save(createdTransactions);
+
+    console.log({
+      str: 'linha createdTransactions apos save...... ',
+      createdTransactions,
+    });
 
     await fs.promises.unlink(filePath);
 
