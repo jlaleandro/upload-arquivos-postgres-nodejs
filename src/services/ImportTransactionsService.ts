@@ -74,7 +74,7 @@ class ImportTransactionsService {
         type: transaction.type,
         value: transaction.value,
         category: finalCategories.find(
-          category => category.title == transaction.category,
+          category => category.title === transaction.category,
         ),
       })),
     );
@@ -82,9 +82,6 @@ class ImportTransactionsService {
     await transactionsRepository.save(createdTransactions);
 
     await fs.promises.unlink(filePath);
-
-    console.log(categories);
-    console.log(transactions);
 
     return createdTransactions;
   }
